@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h1 class="m-0"><i class="fas fa-users me-2"></i>Funcionários</h1>
+            <p class="text-muted m-0">Pesquisar e gerenciar funcionários</p>
+        </div>
+    </div>
+ </div>
+
+<form class="card card-body mb-3" method="get" action="{{ url_for('funcionarios_pesquisar') }}">
+    <input type="hidden" name="search" value="1">
+    <div class="row g-3 align-items-end">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <div class="flex-shrink-0" style="width: 200px;">
+                    <label class="form-label">Pesquisar por</label>
+                    <select class="form-select select-graphite" name="field">
+                        <option value="nome" {% if (field or request.args.get('field','nome'))=='nome' %}selected{% endif %}>Nome</option>
+                        <option value="email" {% if (field or request.args.get('field'))=='email' %}selected{% endif %}>Email</option>
+                        <option value="cargo" {% if (field or request.args.get('field'))=='cargo' %}selected{% endif %}>Cargo</option>
+                        <option value="codigo" {% if (field or request.args.get('field'))=='codigo' %}selected{% endif %}>Código</option>
+                    </select>
+                </div>
+                <div class="flex-grow-1">
+                    <label class="form-label">Busca</label>
+                    <input type="text" name="query" value="{{ query or '' }}" class="form-control" placeholder="Digite sua busca...">
+                </div>
+                <div class="flex-shrink-0" style="width: 160px;">
+                    <label class="form-label">Por página</label>
+                    <select class="form-select" name="per_page">
+                        {% for n in [5,10,20,50] %}
+                            <option value="{{ n }}" {% if per_page==n %}selected{% endif %}>{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-end" style="width: 64px;">
+                    <button type="submit" class="btn btn-graphite w-100" aria-label="Aplicar filtros" title="Aplicar filtros">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mt-3">
+            <a href="{{ url_for('criar_funcionario') }}" class="btn btn-graphite">
+                <i class="fas fa-plus me-1"></i>Inserir
+            </a>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="professional-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Cargo</th>
+                    <th class="text-center">Ativo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if show_results and funcionarios and funcionarios.items %}
+                    {% for f in funcionarios.items %}
+                    <tr>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="showNotification('Funcionalidade de visualização em desenvolvimento', 'info'); return false;">
+                                            <i class="fas fa-eye me-2"></i>Visualizar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="showNotification('Funcionalidade de edição em desenvolvimento', 'info'); return false;">
+                                            <i class="fas fa-pen-to-square me-2"></i>Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-danger" type="button" 
+                                                onclick="showNotification('Exclusão de funcionário não implementada', 'warning');">
+                                            <i class="fas fa-trash me-2"></i>Excluir
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td>{{ f.id }}</td>
+                        <td>{{ f.usuario.nome }}</td>
+                        <td>{{ f.usuario.email }}</td>
+                        <td>{{ f.cargo.nome }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-{{ 'success' if f.ativo else 'secondary' }}">{{ 'Ativo' if f.ativo else 'Inativo' }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <i class="fas fa-filter fa-2x text-muted mb-2"></i>
+                            <div class="text-muted">Use os filtros acima e clique em "Aplicar" para visualizar os funcionários.</div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-body">
+        <nav aria-label="Page navigation" class="d-flex justify-content-center">
+            <ul class="pagination m-0">
+                <li class="page-item {% if not (funcionarios and funcionarios.has_prev) %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('funcionarios_pesquisar', query=query or '', page=(funcionarios.prev_num if (funcionarios and funcionarios.has_prev) else 1), field=(field or request.args.get('field','nome')), per_page=per_page, search=1) }}">&laquo;</a>
+                </li>
+                <li class="page-item disabled"><span class="page-link">Página {{ funcionarios.page if funcionarios else 1 }} de {{ funcionarios.pages if funcionarios else 1 }}</span></li>
+                <li class="page-item {% if not (funcionarios and funcionarios.has_next) %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('funcionarios_pesquisar', query=query or '', page=(funcionarios.next_num if (funcionarios and funcionarios.has_next) else (funcionarios.page if funcionarios else 1)), field=(field or request.args.get('field','nome')), per_page=per_page, search=1) }}">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+{% endblock %}
+

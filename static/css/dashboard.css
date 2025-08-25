@@ -1,0 +1,156 @@
+/* Dashboard Styles - Atalhos Rápidos e Melhorias */
+
+/* Atalhos Rápidos */
+.quick-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    color: inherit;
+    background: rgba(255, 255, 255, 1);
+}
+
+.quick-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quick-action-card:hover::before {
+    opacity: 1;
+}
+
+.quick-action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.quick-action-icon i {
+    font-size: 24px;
+    color: white;
+}
+
+.quick-action-card:hover .quick-action-icon {
+    transform: scale(1.1);
+}
+
+.quick-action-text {
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    color: var(--gray-700);
+    position: relative;
+    z-index: 1;
+}
+
+/* Cores personalizadas para atalhos */
+.bg-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.bg-teal {
+    background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.text-purple {
+    color: #8b5cf6 !important;
+}
+
+.text-teal {
+    color: #14b8a6 !important;
+}
+
+/* Melhorar cards de estatísticas */
+.stats-card {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    border-left-color: var(--primary-color);
+}
+
+.stats-card:nth-child(1) {
+    border-left-color: var(--primary-color);
+}
+
+.stats-card:nth-child(2) {
+    border-left-color: #dc3545;
+}
+
+.stats-card:nth-child(3) {
+    border-left-color: #17a2b8;
+}
+
+.stats-card:nth-child(4) {
+    border-left-color: #28a745;
+}
+
+/* Ícones coloridos */
+.stats-icon.text-primary {
+    color: #0d6efd !important;
+}
+
+.stats-icon.text-danger {
+    color: #dc3545 !important;
+}
+
+.stats-icon.text-info {
+    color: #0dcaf0 !important;
+}
+
+.stats-icon.text-success {
+    color: #198754 !important;
+}
+
+.stats-icon.text-warning {
+    color: #ffc107 !important;
+}
+
+/* Responsividade dos atalhos */
+@media (max-width: 768px) {
+    .quick-action-card {
+        padding: 1rem 0.5rem;
+    }
+    
+    .quick-action-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .quick-action-icon i {
+        font-size: 20px;
+    }
+    
+    .quick-action-text {
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h1 class="m-0"><i class="fas fa-calendar-plus me-2"></i>Agendar</h1>
+            <p class="text-muted m-0">Crie novos agendamentos vinculados a clientes, funcionários e serviços</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-lg-8">
+        <form method="post" class="card card-body">
+            {{ form.hidden_tag() }}
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6 position-relative">
+                    <label class="form-label">Cliente</label>
+                    <input type="text" id="cliente-autocomplete" class="form-control" placeholder="Digite o nome do cliente...">
+                    <input type="hidden" id="cliente_id" name="cliente_id">
+                </div>
+                <div class="col-12 col-md-6 position-relative">
+                    <label class="form-label">Funcionário</label>
+                    <input type="text" id="funcionario-autocomplete" class="form-control" placeholder="Digite o nome do funcionário...">
+                    <input type="hidden" id="funcionario_id" name="funcionario_id">
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Serviço</label>
+                    {{ form.servico_id(class='form-select select-graphite') }}
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Data e Hora</label>
+                    {{ form.data_agendamento(class='form-control') }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Observações</label>
+                    {{ form.observacoes(class='form-control', rows='3', placeholder='Observações relevantes...') }}
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-graphite">
+                    <i class="fas fa-check me-1"></i>Confirmar agendamento
+                </button>
+                <a href="{{ url_for('agendamentos') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-list me-1"></i>Ver agendamentos
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">Resumo e Dicas</div>
+            <div class="card-body">
+                <ul class="mb-3">
+                    <li>Selecione um cliente ativo.</li>
+                    <li>Escolha um funcionário disponível.</li>
+                    <li>O tempo do serviço define a duração.</li>
+                </ul>
+                <div class="alert alert-info">
+                    Conflitos de horário são verificados automaticamente com base no funcionário e na data/hora selecionadas.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function setupAutocomplete(inputId, hiddenId, apiUrl) {
+  const input = document.getElementById(inputId);
+  const hidden = document.getElementById(hiddenId);
+  let timer = null;
+  let list = document.createElement('div');
+  list.className = 'list-group position-absolute w-100';
+  list.style.zIndex = 2000;
+  input.parentElement.appendChild(list);
+
+  input.addEventListener('input', () => {
+    hidden.value = '';
+    const q = input.value.trim();
+    clearTimeout(timer);
+    if (!q) { list.innerHTML=''; return; }
+    timer = setTimeout(async () => {
+      const res = await fetch(apiUrl + '?q=' + encodeURIComponent(q));
+      const data = await res.json();
+      list.innerHTML = '';
+      data.forEach(item => {
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'list-group-item list-group-item-action';
+        a.textContent = item.label;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          input.value = item.label;
+          hidden.value = item.id;
+          list.innerHTML = '';
+        });
+        list.appendChild(a);
+      });
+    }, 250);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!input.parentElement.contains(e.target)) list.innerHTML='';
+  });
+}
+
+setupAutocomplete('cliente-autocomplete', 'cliente_id', '{{ url_for('api_search_clientes') }}');
+setupAutocomplete('funcionario-autocomplete', 'funcionario_id', '{{ url_for('api_search_funcionarios') }}');
+</script>
+{% endblock %}
+{% endblock %}
+

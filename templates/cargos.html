@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="m-0"><i class="fas fa-sitemap me-2"></i>Cargos</h1>
+            <p class="text-muted m-0">Gerenciar cargos de funcionários</p>
+        </div>
+    </div>
+</div>
+
+<form method="GET" action="{{ url_for('cargos_pesquisar') }}" class="card card-body mb-3">
+    <input type="hidden" name="search" value="1">
+    <div class="row g-3 align-items-end">
+        <div class="col-12">
+            <div class="d-flex gap-2">
+                <div class="flex-shrink-0" style="width: 200px;">
+                    <label class="form-label">Pesquisar por</label>
+                    <select class="form-select select-graphite" name="field">
+                        <option value="nome" {% if (field or request.args.get('field','nome'))=='nome' %}selected{% endif %}>Nome</option>
+                        <option value="descricao" {% if (field or request.args.get('field'))=='descricao' %}selected{% endif %}>Descrição</option>
+                        <option value="codigo" {% if (field or request.args.get('field'))=='codigo' %}selected{% endif %}>Código</option>
+                    </select>
+                </div>
+                <div class="flex-grow-1">
+                    <label class="form-label">Busca</label>
+                    <input type="text" name="query" class="form-control" placeholder="Digite sua busca..." value="{{ query }}">
+                </div>
+                <div class="flex-shrink-0" style="width: 160px;">
+                    <label class="form-label">Por página</label>
+                    <select class="form-select" name="per_page">
+                        {% for n in [5,10,20,50] %}
+                            <option value="{{ n }}" {% if per_page==n %}selected{% endif %}>{{ n }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-end" style="width: 64px;">
+                    <button class="btn btn-graphite w-100" type="submit" aria-label="Aplicar filtros" title="Aplicar filtros">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 mt-3">
+            <a href="{{ url_for('cargos_inserir_form') }}" class="btn btn-graphite">
+                <i class="fas fa-plus me-1"></i>Inserir
+            </a>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="professional-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if show_results and cargos and cargos.items %}
+                    {% for cargo in cargos.items %}
+                    <tr>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light dropdown-toggle" type="button" id="dropdownMenuButton-{{ cargo.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ cargo.id }}">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="showNotification('Funcionalidade de visualização em desenvolvimento', 'info'); return false;">
+                                            <i class="fas fa-eye me-2"></i>Visualizar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('cargos_editar', cargo_id=cargo.id) }}">
+                                            <i class="fas fa-pen-to-square me-2"></i>Editar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="dropdown-item text-danger" 
+                                                onclick="if(confirm('Excluir o cargo {{ cargo.nome }}?')) {
+                                                    const form = document.createElement('form');
+                                                    form.method = 'POST';
+                                                    form.action = '{{ url_for('cargos_excluir', cargo_id=cargo.id) }}';
+                                                    document.body.appendChild(form);
+                                                    form.submit();
+                                                }">
+                                            <i class="fas fa-trash me-2"></i>Excluir
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td>{{ cargo.id }}</td>
+                        <td>{{ cargo.nome }}</td>
+                        <td>{{ cargo.descricao or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            {% if show_results %}
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                Nenhum cargo encontrado.
+                            {% else %}
+                                <i class="fas fa-filter fa-2x mb-2"></i>
+                                Use os filtros acima e clique em "Aplicar" para visualizar os cargos.
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-body">
+        <nav aria-label="Page navigation" class="d-flex justify-content-center">
+            <ul class="pagination m-0">
+                <li class="page-item {% if not (cargos and cargos.has_prev) %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('cargos_pesquisar', query=query, page=(cargos.prev_num if (cargos and cargos.has_prev) else 1), field=(field or request.args.get('field','nome')), per_page=per_page, search=1) }}">&laquo;</a>
+                </li>
+                <li class="page-item disabled"><span class="page-link">Página {{ cargos.page if cargos else 1 }} de {{ cargos.pages if cargos else 1 }}</span></li>
+                <li class="page-item {% if not (cargos and cargos.has_next) %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('cargos_pesquisar', query=query, page=(cargos.next_num if (cargos and cargos.has_next) else (cargos.page if cargos else 1)), field=(field or request.args.get('field','nome')), per_page=per_page, search=1) }}">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+{% endblock %}
+

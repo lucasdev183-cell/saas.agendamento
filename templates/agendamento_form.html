@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="d-flex align-items-center justify-content-between">
+        <div>
+            <h1 class="m-0"><i class="fas fa-calendar-edit me-2"></i>{{ titulo }}</h1>
+            <p class="text-muted m-0">Edite o status e observações do agendamento</p>
+        </div>
+        <a href="{{ url_for('agendamentos') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Voltar para lista
+        </a>
+    </div>
+
+    {% if form.errors %}
+    <div class="alert alert-danger mt-3" role="alert">
+        <strong>Erros ao salvar:</strong> Verifique os campos destacados.
+    </div>
+    {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
+        <!-- Informações do Agendamento -->
+        <div class="card form-card mb-4">
+            <div class="card-header bg-gradient-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Informações do Agendamento
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted d-block">Cliente</small>
+                                <strong>{{ agendamento.cliente.nome }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-tie text-success me-2"></i>
+                            <div>
+                                <small class="text-muted d-block">Funcionário</small>
+                                <strong>{{ agendamento.funcionario.usuario.nome }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-cut text-warning me-2"></i>
+                            <div>
+                                <small class="text-muted d-block">Serviço</small>
+                                <strong>{{ agendamento.servico.nome }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar text-info me-2"></i>
+                            <div>
+                                <small class="text-muted d-block">Data e Hora</small>
+                                <strong>{{ agendamento.data_agendamento.strftime('%d/%m/%Y às %H:%M') }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Edição -->
+        <div class="card form-card">
+            <div class="card-header bg-gradient-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Agendamento
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <select name="status" class="form-select" id="status" required>
+                                    <option value="agendado" {{ 'selected' if form.status.data == 'agendado' else '' }}>Agendado</option>
+                                    <option value="concluido" {{ 'selected' if form.status.data == 'concluido' else '' }}>Concluído</option>
+                                    <option value="cancelado" {{ 'selected' if form.status.data == 'cancelado' else '' }}>Cancelado</option>
+                                </select>
+                                <label for="status">Status do Agendamento</label>
+                            </div>
+                            <div class="form-text text-muted small">
+                                <i class="fas fa-info-circle me-1"></i>Atualize o status conforme o andamento do serviço.
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea name="observacoes" class="form-control" id="observacoes" placeholder="Observações sobre o agendamento" style="height: 120px;">{{ form.observacoes.data or '' }}</textarea>
+                                <label for="observacoes">Observações</label>
+                            </div>
+                            <div class="form-text text-muted small">
+                                <i class="fas fa-clipboard me-1"></i>Adicione observações importantes sobre o atendimento.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4" role="alert">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Dica:</strong> Use as observações para registrar detalhes importantes sobre o atendimento, como preferências do cliente ou situações especiais.
+                    </div>
+                    
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end mt-4">
+                        <a href="{{ url_for('agendamentos') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Atualizar agendamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
