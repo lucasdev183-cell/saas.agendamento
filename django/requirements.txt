@@ -1,0 +1,13 @@
+Django==5.2.5
+psycopg2-binary==2.9.10
+django-crispy-forms==2.4
+crispy-bootstrap5==2025.6
+Pillow==11.3.0
+
+# Additional packages for production deployment
+gunicorn==23.0.0
+whitenoise==6.8.2
+
+# Development packages (optional)
+# django-debug-toolbar==4.4.6
+# django-extensions==3.2.3
