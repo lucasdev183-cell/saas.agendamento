@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="page-header">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+        <p class="text-muted">Visão geral do sistema</p>
+    </div>
+    
+    <div class="row">
+        {% if user.is_master %}
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total de Usuários</h6>
+                                <h3 class="card-title">{{ stats.total_usuarios }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Funcionários</h6>
+                                <h3 class="card-title">{{ stats.total_funcionarios }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Agendamentos</h6>
+                                <h3 class="card-title">{{ stats.total_agendamentos }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Agendamentos Hoje</h6>
+                                <h3 class="card-title">{{ stats.agendamentos_hoje }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% elif user.is_funcionario %}
+            <div class="col-md-6 col-sm-12 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Meus Agendamentos Hoje</h6>
+                                <h3 class="card-title">{{ stats.meus_agendamentos_hoje }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-sm-12 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Agendamentos Pendentes</h6>
+                                <h3 class="card-title">{{ stats.meus_agendamentos_pendentes }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-md-6 col-sm-12 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Meus Agendamentos</h6>
+                                <h3 class="card-title">{{ stats.meus_agendamentos }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-sm-12 mb-4">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Próximos Agendamentos</h6>
+                                <h3 class="card-title">{{ stats.meus_proximos_agendamentos }}</h3>
+                            </div>
+                            <div class="stats-icon">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if agendamentos_recentes %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Agendamentos Recentes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Funcionário</th>
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                    <th>Serviço</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for agendamento in agendamentos_recentes %}
+                                <tr>
+                                    <td>{{ agendamento.cliente.nome }}</td>
+                                    <td>{{ agendamento.funcionario.usuario.nome }}</td>
+                                    <td>{{ agendamento.data_agendamento|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if agendamento.status == 'agendado' %}primary{% elif agendamento.status == 'concluido' %}success{% else %}danger{% endif %}">
+                                            {{ agendamento.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ agendamento.servico|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-rocket me-2"></i>
+                        Ações Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if user.is_master or user.pode_agendar %}
+                        <a href="{% url 'agendamentos:agendar' %}" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Novo Agendamento
+                        </a>
+                        {% endif %}
+                        
+                        {% if user.is_master or user.pode_cadastrar_cliente %}
+                        <a href="{% url 'usuarios:cliente_inserir' %}" class="btn btn-success">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Cadastrar Cliente
+                        </a>
+                        {% endif %}
+                        
+                        {% if user.is_master %}
+                        <a href="{% url 'usuarios:servicos_main' %}" class="btn btn-info">
+                            <i class="fas fa-cut me-2"></i>
+                            Gerenciar Serviços
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informações do Sistema
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <strong>Usuário:</strong> {{ user.nome }}
+                        </li>
+                        <li class="mb-2">
+                            <strong>Tipo:</strong> {% if user.is_master %}Master{% else %}Restrito{% endif %}
+                        </li>
+                        <li class="mb-2">
+                            <strong>Empresa:</strong> {{ config.nome_empresa|default:"JT Sistemas" }}
+                        </li>
+                        <li class="mb-0">
+                            <strong>Último acesso:</strong> {{ user.last_login|date:"d/m/Y H:i"|default:"Primeiro acesso" }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
